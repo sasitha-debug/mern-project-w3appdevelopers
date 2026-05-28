@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { motion } from "framer-motion"
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -33,17 +33,45 @@ interface Contact {
   createdAt: string
 }
 
-const initialContacts: Contact[] = [
-  { id: "1", name: "John Smith", email: "john@example.com", subject: "Website Development Inquiry", message: "Hi, I'm interested in getting a website developed for my business. Could you provide more information about your services and pricing?", status: "new", createdAt: "2024-01-15 10:30" },
-  { id: "2", name: "Lisa Wang", email: "lisa@company.com", subject: "Mobile App Project", message: "We're looking for a team to develop a mobile app. Would love to discuss the project scope and timeline.", status: "read", createdAt: "2024-01-14 15:45" },
-  { id: "3", name: "Mike Brown", email: "mike@startup.io", subject: "Partnership Opportunity", message: "I represent a startup and we're interested in a potential partnership for our upcoming project.", status: "replied", createdAt: "2024-01-13 09:15" },
-  { id: "4", name: "Sarah Davis", email: "sarah@brand.com", subject: "Digital Marketing Services", message: "Looking for comprehensive digital marketing services. Can you share your packages?", status: "new", createdAt: "2024-01-12 14:20" },
-]
-
 export default function ContactsPage() {
-  const [contacts, setContacts] = useState<Contact[]>(initialContacts)
+  const [contacts, setContacts] = useState<Contact[]>([])
+  const [isLoading, setIsLoading] = useState(true)
   const [searchQuery, setSearchQuery] = useState("")
   const [selectedContact, setSelectedContact] = useState<Contact | null>(null)
+
+  const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:5000"
+
+  useEffect(() => {
+    const loadContacts = async () => {
+      try {
+        const response = await fetch(`${backendUrl}/api/contact`)
+
+        if (!response.ok) {
+          throw new Error("Failed to load contact messages")
+        }
+
+        const data = await response.json()
+
+        const mappedContacts = data.map((message: Record<string, unknown>) => ({
+          id: String(message._id),
+          name: String(message.name),
+          email: String(message.email),
+          subject: String(message.subject),
+          message: String(message.message),
+          status: (message.status as Contact["status"]) || "new",
+          createdAt: new Date(String(message.createdAt)).toLocaleString(),
+        }))
+
+        setContacts(mappedContacts)
+      } catch (error) {
+        toast.error(error instanceof Error ? error.message : "Failed to load contact messages")
+      } finally {
+        setIsLoading(false)
+      }
+    }
+
+    void loadContacts()
+  }, [backendUrl])
 
   const filteredContacts = contacts.filter(c => 
     c.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -114,26 +142,40 @@ export default function ContactsPage() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {filteredContacts.map((contact) => (
-                <TableRow key={contact.id} className={contact.status === "new" ? "bg-blue-50/50 dark:bg-blue-950/20" : ""}>
-                  <TableCell>
-                    <span className={`w-2 h-2 rounded-full ${getStatusColor(contact.status)} inline-block`} />
-                  </TableCell>
-                  <TableCell className="font-medium">{contact.name}</TableCell>
-                  <TableCell>{contact.email}</TableCell>
-                  <TableCell className="max-w-xs truncate">{contact.subject}</TableCell>
-                  <TableCell className="text-muted-foreground text-sm">
-                    <div className="flex items-center gap-1">
-                      <Clock className="w-3 h-3" />
-                      {contact.createdAt}
-                    </div>
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <Button variant="ghost" size="sm" onClick={() => handleView(contact)}><Eye className="w-4 h-4" /></Button>
-                    <Button variant="ghost" size="sm" onClick={() => handleDelete(contact.id)} className="text-destructive hover:text-destructive"><Trash2 className="w-4 h-4" /></Button>
+              {isLoading ? (
+                <TableRow>
+                  <TableCell colSpan={6} className="text-center text-muted-foreground py-8">
+                    Loading contact messages...
                   </TableCell>
                 </TableRow>
-              ))}
+              ) : filteredContacts.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={6} className="text-center text-muted-foreground py-8">
+                    No contact messages yet.
+                  </TableCell>
+                </TableRow>
+              ) : (
+                filteredContacts.map((contact) => (
+                  <TableRow key={contact.id} className={contact.status === "new" ? "bg-blue-50/50 dark:bg-blue-950/20" : ""}>
+                    <TableCell>
+                      <span className={`w-2 h-2 rounded-full ${getStatusColor(contact.status)} inline-block`} />
+                    </TableCell>
+                    <TableCell className="font-medium">{contact.name}</TableCell>
+                    <TableCell>{contact.email}</TableCell>
+                    <TableCell className="max-w-xs truncate">{contact.subject}</TableCell>
+                    <TableCell className="text-muted-foreground text-sm">
+                      <div className="flex items-center gap-1">
+                        <Clock className="w-3 h-3" />
+                        {contact.createdAt}
+                      </div>
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <Button variant="ghost" size="sm" onClick={() => handleView(contact)}><Eye className="w-4 h-4" /></Button>
+                      <Button variant="ghost" size="sm" onClick={() => handleDelete(contact.id)} className="text-destructive hover:text-destructive"><Trash2 className="w-4 h-4" /></Button>
+                    </TableCell>
+                  </TableRow>
+                ))
+              )}
             </TableBody>
           </Table>
         </CardContent>

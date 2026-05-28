@@ -1,7 +1,7 @@
 "use client"
 
 import Link from "next/link"
-import { Facebook, Instagram, Linkedin, Twitter } from "lucide-react"
+import { Facebook, Instagram, Linkedin } from "lucide-react"
 
 const footerLinks = {
   company: [
@@ -25,10 +25,9 @@ const footerLinks = {
 }
 
 const socialLinks = [
-  { icon: Facebook, href: "#", label: "Facebook" },
-  { icon: Instagram, href: "#", label: "Instagram" },
-  { icon: Linkedin, href: "#", label: "LinkedIn" },
-  { icon: Twitter, href: "#", label: "Twitter" },
+  { icon: Facebook, href: "https://www.facebook.com/W3AppDevelopers", label: "Facebook" },
+  { icon: Instagram, href: "https://www.instagram.com/w3appdevelopers", label: "Instagram" },
+  { icon: Linkedin, href: "https://www.linkedin.com/company/w3appdevelopers/", label: "LinkedIn" },
 ]
 
 export function Footer() {
@@ -51,6 +50,8 @@ export function Footer() {
                 <a
                   key={social.label}
                   href={social.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
                   aria-label={social.label}
                   className="w-10 h-10 bg-sidebar-accent rounded-full flex items-center justify-center hover:bg-primary transition-colors"
                 >

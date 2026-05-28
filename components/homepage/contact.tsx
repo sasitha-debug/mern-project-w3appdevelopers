@@ -14,40 +14,69 @@ const contactInfo = [
   {
     icon: Mail,
     title: "Email Us",
-    value: "info@w3appdevelopers.com",
-    href: "mailto:info@w3appdevelopers.com",
+    value: "digital@w3appdevelopers.com",
+    href: "mailto:digital@w3appdevelopers.com",
   },
   {
     icon: Phone,
     title: "Call Us",
-    value: "+1 (555) 123-4567",
-    href: "tel:+15551234567",
+    value: "9698548633",
+    href: "tel:9698548633",
   },
   {
     icon: MapPin,
     title: "Visit Us",
-    value: "123 Tech Street, Innovation City",
-    href: "#",
+    value: "Mullamparapu, Erode",
+    href: "https://www.google.com/maps/search/?api=1&query=Mullamparapu,+Erode",
   },
 ]
 
 export function Contact() {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isSubmitted, setIsSubmitted] = useState(false)
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    subject: "",
+    message: "",
+  })
+
+  const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:5000"
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     setIsSubmitting(true)
-    
-    // Simulate form submission
-    await new Promise((resolve) => setTimeout(resolve, 1500))
-    
-    setIsSubmitting(false)
-    setIsSubmitted(true)
-    toast.success("Message sent successfully! We'll get back to you soon.")
-    
-    // Reset form after 3 seconds
-    setTimeout(() => setIsSubmitted(false), 3000)
+
+    try {
+      const response = await fetch(`${backendUrl}/api/contact`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      })
+
+      const result = await response.json()
+
+      if (!response.ok) {
+        throw new Error(result.message || "Failed to send message")
+      }
+
+      setIsSubmitted(true)
+      setFormData({
+        name: "",
+        email: "",
+        subject: "",
+        message: "",
+      })
+      toast.success("Message sent successfully! We'll get back to you soon.")
+
+      setTimeout(() => setIsSubmitted(false), 3000)
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Failed to send message")
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   return (
@@ -106,24 +135,48 @@ export function Contact() {
                   <div className="grid md:grid-cols-2 gap-6">
                     <div className="space-y-2">
                       <Label htmlFor="name">Full Name</Label>
-                      <Input id="name" placeholder="John Doe" required disabled={isSubmitting} />
+                      <Input
+                        id="name"
+                        placeholder="John Doe"
+                        value={formData.name}
+                        onChange={(e) => setFormData((prev) => ({ ...prev, name: e.target.value }))}
+                        required
+                        disabled={isSubmitting}
+                      />
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="email">Email Address</Label>
-                      <Input id="email" type="email" placeholder="john@example.com" required disabled={isSubmitting} />
+                      <Input
+                        id="email"
+                        type="email"
+                        placeholder="john@example.com"
+                        value={formData.email}
+                        onChange={(e) => setFormData((prev) => ({ ...prev, email: e.target.value }))}
+                        required
+                        disabled={isSubmitting}
+                      />
                     </div>
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="subject">Subject</Label>
-                    <Input id="subject" placeholder="How can we help?" required disabled={isSubmitting} />
+                    <Input
+                      id="subject"
+                      placeholder="How can we help?"
+                      value={formData.subject}
+                      onChange={(e) => setFormData((prev) => ({ ...prev, subject: e.target.value }))}
+                      required
+                      disabled={isSubmitting}
+                    />
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="message">Message</Label>
-                    <Textarea 
-                      id="message" 
-                      placeholder="Tell us about your project..." 
-                      rows={5} 
-                      required 
+                    <Textarea
+                      id="message"
+                      placeholder="Tell us about your project..."
+                      rows={5}
+                      value={formData.message}
+                      onChange={(e) => setFormData((prev) => ({ ...prev, message: e.target.value }))}
+                      required
                       disabled={isSubmitting}
                     />
                   </div>

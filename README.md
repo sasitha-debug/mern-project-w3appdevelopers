@@ -34,11 +34,15 @@ https://mern-project-w3appdevelopers.vercel.app
 - MongoDB
 - Mongoose
 
-### Tools
-- Git
-- GitHub
-- VS Code
+## Tools Used
 
+- VS Code
+- GitHub
+- V0
+- GitHub Copilot
+- MongoDB Atlas
+- Vercel
+  
 ## Project Structure
 
 ```

@@ -17,33 +17,31 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
 
-// Demo credentials for testing
-const DEMO_ADMIN = {
-  email: "admin@w3app.com",
-  password: "admin123",
-  id: "1",
-  name: "Admin User"
-}
-
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [admin, setAdmin] = useState<Admin | null>(null)
   const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
-    // Check for existing session
-    const storedAdmin = localStorage.getItem("w3_admin")
-    if (storedAdmin) {
-      setAdmin(JSON.parse(storedAdmin))
+    try {
+      const storedAdmin = localStorage.getItem("w3_admin")
+      if (storedAdmin) {
+        setAdmin(JSON.parse(storedAdmin))
+      }
+    } catch {
+      localStorage.removeItem("w3_admin")
+    } finally {
+      setIsLoading(false)
     }
-    setIsLoading(false)
   }, [])
 
   const login = async (email: string, password: string): Promise<boolean> => {
-    // Simulate API call
     await new Promise(resolve => setTimeout(resolve, 1000))
-    
-    if (email === DEMO_ADMIN.email && password === DEMO_ADMIN.password) {
-      const adminData = { id: DEMO_ADMIN.id, email: DEMO_ADMIN.email, name: DEMO_ADMIN.name }
+
+    const adminEmail = process.env.NEXT_PUBLIC_ADMIN_EMAIL
+    const adminPassword = process.env.NEXT_PUBLIC_ADMIN_PASSWORD
+
+    if (email === adminEmail && password === adminPassword) {
+      const adminData = { id: "1", email, name: "Admin" }
       setAdmin(adminData)
       localStorage.setItem("w3_admin", JSON.stringify(adminData))
       return true

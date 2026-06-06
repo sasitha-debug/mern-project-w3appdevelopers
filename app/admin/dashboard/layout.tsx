@@ -4,7 +4,6 @@ import { useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { AdminSidebar } from "@/components/admin/sidebar"
 import { useAuth } from "@/contexts/auth-context"
-import { Spinner } from "@/components/ui/spinner"
 
 export default function DashboardLayout({
   children,
@@ -23,13 +22,17 @@ export default function DashboardLayout({
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
-        <Spinner className="w-8 h-8 text-primary" />
+        <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin" />
       </div>
     )
   }
 
   if (!admin) {
-    return null
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin" />
+      </div>
+    )
   }
 
   return (

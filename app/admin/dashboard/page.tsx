@@ -1,16 +1,12 @@
 "use client"
 
+import { useEffect, useState } from "react"
 import { motion } from "framer-motion"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { FolderKanban, MessageSquareQuote, Mail, Eye, TrendingUp, Users } from "lucide-react"
 import { useAuth } from "@/contexts/auth-context"
 
-const stats = [
-  { title: "Total Projects", value: "24", icon: FolderKanban, change: "+3 this month", color: "text-blue-500" },
-  { title: "Testimonials", value: "18", icon: MessageSquareQuote, change: "+5 this month", color: "text-green-500" },
-  { title: "Contact Messages", value: "42", icon: Mail, change: "+12 this week", color: "text-orange-500" },
-  { title: "Page Views", value: "8.2K", icon: Eye, change: "+15% vs last week", color: "text-purple-500" },
-]
+const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:5000"
 
 const recentActivities = [
   { action: "New contact message received", time: "2 minutes ago", type: "contact" },
@@ -32,6 +28,27 @@ const itemVariants = {
 
 export default function DashboardPage() {
   const { admin } = useAuth()
+  const [stats, setStats] = useState([
+    { title: "Total Projects", value: "...", icon: FolderKanban, change: "", color: "text-blue-500" },
+    { title: "Testimonials", value: "...", icon: MessageSquareQuote, change: "", color: "text-green-500" },
+    { title: "Contact Messages", value: "...", icon: Mail, change: "", color: "text-orange-500" },
+    { title: "Page Views", value: "8.2K", icon: Eye, change: "+15% vs last week", color: "text-purple-500" },
+  ])
+
+  useEffect(() => {
+    Promise.all([
+      fetch(`${backendUrl}/api/projects`).then(r => r.json()),
+      fetch(`${backendUrl}/api/testimonials`).then(r => r.json()),
+      fetch(`${backendUrl}/api/contact`).then(r => r.json()),
+    ]).then(([projects, testimonials, contacts]) => {
+      setStats(prev => prev.map(s => {
+        if (s.title === "Total Projects") return { ...s, value: String(Array.isArray(projects) ? projects.length : 0), change: `${Array.isArray(projects) ? projects.length : 0} total` }
+        if (s.title === "Testimonials") return { ...s, value: String(Array.isArray(testimonials) ? testimonials.length : 0), change: `${Array.isArray(testimonials) ? testimonials.length : 0} total` }
+        if (s.title === "Contact Messages") return { ...s, value: String(Array.isArray(contacts) ? contacts.length : 0), change: `${Array.isArray(contacts) ? contacts.length : 0} total` }
+        return s
+      }))
+    }).catch(() => {})
+  }, [])
 
   return (
     <div className="space-y-8">
@@ -112,7 +129,7 @@ export default function DashboardPage() {
           </Card>
         </motion.div>
 
-        {/* Quick Actions */}
+        {/* Quick Stats */}
         <motion.div
           initial={{ opacity: 0, x: 20 }}
           animate={{ opacity: 1, x: 0 }}

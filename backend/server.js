@@ -46,8 +46,19 @@ const testimonialSchema = new mongoose.Schema({
   rating: { type: Number, default: 5 },
 }, { timestamps: true });
 
+const contentSchema = new mongoose.Schema({
+  heroTitle: String,
+  heroSubtitle: String,
+  heroDescription: String,
+  aboutTitle: String,
+  aboutDescription: String,
+  ctaTitle: String,
+  ctaDescription: String,
+}, { timestamps: true });
+
 const Project = mongoose.model("Project", projectSchema);
 const Testimonial = mongoose.model("Testimonial", testimonialSchema);
+const Content = mongoose.model("Content", contentSchema);
 
 // ─── Routes ───────────────────────────────────────────────────────────────────
 
@@ -165,6 +176,31 @@ app.delete("/api/testimonials/:id", async (req, res) => {
     return res.status(200).json({ success: true, message: "Testimonial deleted." });
   } catch (error) {
     return res.status(500).json({ success: false, message: "Failed to delete testimonial." });
+  }
+});
+
+// Content
+app.get("/api/content", async (req, res) => {
+  try {
+    const content = await Content.findOne().lean();
+    return res.status(200).json(content || {});
+  } catch (error) {
+    return res.status(500).json({ success: false, message: "Failed to fetch content." });
+  }
+});
+
+app.post("/api/content", async (req, res) => {
+  try {
+    const existing = await Content.findOne();
+    if (existing) {
+      const updated = await Content.findByIdAndUpdate(existing._id, req.body, { new: true });
+      return res.status(200).json({ success: true, data: updated });
+    } else {
+      const content = await Content.create(req.body);
+      return res.status(201).json({ success: true, data: content });
+    }
+  } catch (error) {
+    return res.status(500).json({ success: false, message: "Failed to save content." });
   }
 });
 

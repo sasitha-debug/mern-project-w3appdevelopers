@@ -1,5 +1,6 @@
 "use client"
 
+import { useEffect, useState } from "react"
 import { motion } from "framer-motion"
 import { CheckCircle } from "lucide-react"
 
@@ -12,12 +13,29 @@ const aboutPoints = [
   "On-time delivery guaranteed",
 ]
 
+interface Content {
+  aboutTitle?: string
+  aboutDescription?: string
+}
+
 export function About() {
+  const [content, setContent] = useState<Content>({})
+
+  useEffect(() => {
+    const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:5000"
+    fetch(`${backendUrl}/api/content`)
+      .then(res => res.json())
+      .then(data => setContent(data))
+      .catch(() => {})
+  }, [])
+
+  const aboutTitle = content.aboutTitle || "About W3 App Developers"
+  const aboutDescription = content.aboutDescription || "We are a leading web development company dedicated to delivering innovative digital solutions that drive business growth. Our team of skilled professionals combines creativity with technical expertise to build exceptional products."
+
   return (
     <section id="about" className="py-20">
       <div className="container mx-auto px-4 lg:px-8">
         <div className="grid lg:grid-cols-2 gap-12 items-center">
-          {/* Content */}
           <motion.div
             initial={{ opacity: 0, x: -50 }}
             whileInView={{ opacity: 1, x: 0 }}
@@ -25,16 +43,10 @@ export function About() {
             transition={{ duration: 0.6 }}
           >
             <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
-              About <span className="text-primary">W3 App Developers</span>
+              <span className="text-primary">{aboutTitle}</span>
             </h2>
-            <p className="text-muted-foreground mb-6 leading-relaxed">
-              We are a leading web development company dedicated to delivering innovative digital solutions 
-              that drive business growth. Our team of skilled professionals combines creativity with technical 
-              expertise to build exceptional products.
-            </p>
             <p className="text-muted-foreground mb-8 leading-relaxed">
-              Whether you need a stunning website, a powerful mobile app, or comprehensive digital marketing 
-              strategies, we have the expertise to transform your vision into reality.
+              {aboutDescription}
             </p>
             
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -54,7 +66,6 @@ export function About() {
             </div>
           </motion.div>
 
-          {/* Visual */}
           <motion.div
             initial={{ opacity: 0, x: 50 }}
             whileInView={{ opacity: 1, x: 0 }}

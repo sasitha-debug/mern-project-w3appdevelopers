@@ -1,11 +1,12 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import Link from "next/link"
-import { motion, AnimatePresence } from "framer-motion"
-import { Menu, X } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { ThemeSwitcher } from "@/components/theme-switcher"
+import { useState, useEffect } from "react";
+import Link from "next/link";
+import { motion, AnimatePresence } from "framer-motion";
+import { Menu, X } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { ThemeSwitcher } from "@/components/theme-switcher";
+import Image from "next/image"
 
 const navLinks = [
   { name: "HOME", href: "#home" },
@@ -14,36 +15,44 @@ const navLinks = [
   { name: "PROJECTS", href: "#projects" },
   { name: "TESTIMONIALS", href: "#testimonials" },
   { name: "CONTACT US", href: "#contact" },
-]
+];
 
 export function Navbar() {
-  const [isScrolled, setIsScrolled] = useState(false)
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+  const [isScrolled, setIsScrolled] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
-      setIsScrolled(window.scrollY > 50)
-    }
-    window.addEventListener("scroll", handleScroll)
-    return () => window.removeEventListener("scroll", handleScroll)
-  }, [])
+      setIsScrolled(window.scrollY > 50);
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   return (
     <motion.header
       initial={{ y: -100 }}
       animate={{ y: 0 }}
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        isScrolled ? "bg-background/95 backdrop-blur-md shadow-md" : "bg-transparent"
+        isScrolled
+          ? "bg-background/95 backdrop-blur-md shadow-md"
+          : "bg-transparent"
       }`}
     >
       <nav className="container mx-auto px-4 lg:px-8">
         <div className="flex items-center justify-between h-16 lg:h-20">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2">
-            <div className="w-12 h-12 bg-primary rounded-lg flex items-center justify-center">
-              <span className="text-primary-foreground font-bold text-xl">W3</span>
-            </div>
-            <span className="hidden sm:block text-xs text-muted-foreground">App Developers</span>
+            <Image
+              src="/w3-logo.png"
+              alt="W3 App Developers"
+              width={48}
+              height={48}
+              className="rounded-lg"
+            />
+            <span className="hidden sm:block text-xs text-muted-foreground">
+              App Developers
+            </span>
           </Link>
 
           {/* Desktop Navigation */}
@@ -101,7 +110,10 @@ export function Navbar() {
                   </Link>
                 ))}
                 <div className="px-4 pt-2">
-                  <Button asChild className="w-full bg-primary hover:bg-primary/90">
+                  <Button
+                    asChild
+                    className="w-full bg-primary hover:bg-primary/90"
+                  >
                     <Link href="#contact">Get a Quote</Link>
                   </Button>
                 </div>
@@ -111,5 +123,5 @@ export function Navbar() {
         </AnimatePresence>
       </nav>
     </motion.header>
-  )
+  );
 }

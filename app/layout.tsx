@@ -1,47 +1,44 @@
-import type { Metadata } from 'next'
-import { Inter, Poppins } from 'next/font/google'
-import { Analytics } from '@vercel/analytics/next'
-import { Toaster } from '@/components/ui/sonner'
-import { ThemeProvider } from '@/components/theme-provider'
-import './globals.css'
+import type { Metadata } from "next";
+import { Inter, Poppins } from "next/font/google";
+import { Analytics } from "@vercel/analytics/next";
+import { Toaster } from "@/components/ui/sonner";
+import { ThemeProvider } from "@/components/theme-provider";
+import "./globals.css";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
-const poppins = Poppins({ 
-  subsets: ["latin"], 
+const poppins = Poppins({
+  subsets: ["latin"],
   weight: ["400", "500", "600", "700"],
-  variable: "--font-poppins"
+  variable: "--font-poppins",
 });
 
 export const metadata: Metadata = {
-  title: 'W3 App Developers - Innovative Digital Solutions',
-  description: 'Leading web development company providing top-tier IT services using the latest technologies to deliver affordable and innovative solutions.',
-  keywords: ['web development', 'app development', 'digital marketing', 'software development'],
+  title: "W3 App Developers - Innovative Digital Solutions",
+  description:
+    "Leading web development company providing top-tier IT services using the latest technologies to deliver affordable and innovative solutions.",
+  keywords: [
+    "web development",
+    "app development",
+    "digital marketing",
+    "software development",
+  ],
   icons: {
-    icon: [
-      {
-        url: '/icon-light-32x32.png',
-        media: '(prefers-color-scheme: light)',
-      },
-      {
-        url: '/icon-dark-32x32.png',
-        media: '(prefers-color-scheme: dark)',
-      },
-      {
-        url: '/icon.svg',
-        type: 'image/svg+xml',
-      },
-    ],
-    apple: '/apple-icon.png',
+    icon: "/w3-logo.png",
+    apple: "/apple-icon.png",
   },
-}
+};
 
 export default function RootLayout({
   children,
 }: Readonly<{
-  children: React.ReactNode
+  children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${inter.variable} ${poppins.variable}`} suppressHydrationWarning>
+    <html
+      lang="en"
+      className={`${inter.variable} ${poppins.variable}`}
+      suppressHydrationWarning
+    >
       <body className="font-sans antialiased bg-background">
         <ThemeProvider
           attribute="class"
@@ -51,9 +48,9 @@ export default function RootLayout({
         >
           {children}
           <Toaster />
-          {process.env.NODE_ENV === 'production' && <Analytics />}
+          {process.env.NODE_ENV === "production" && <Analytics />}
         </ThemeProvider>
       </body>
     </html>
-  )
+  );
 }
